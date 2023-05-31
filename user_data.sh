@@ -36,3 +36,13 @@ aws ssm put-parameter \
     --type String \
     --tags "Key=Environment,Value=${environment_variable}" \
     --region "${region}"
+yum update -y
+wget https://artifacts.elastic.co/downloads/kibana/kibana-7.17.8-x86_64.rpm
+sudo rpm --install kibana-7.17.8-x86_64.rpm
+private_ip=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+echo "server.host: "$private_ip"">> /etc/kibana/kibana.yml
+echo "server.port: "5601""  >> /etc/kibana/kibana.yml
+echo "elasticsearch.hosts: [\"http://$private_ip:9200\"]"  >> /etc/kibana/kibana.yml
+echo "elasticsearch.username: "$elastic_username""  >> /etc/kibana/kibana.yml
+echo "elasticsearch.password: "$elastic_pass""  >> /etc/kibana/kibana.yml
+systemctl enable --now kibana
